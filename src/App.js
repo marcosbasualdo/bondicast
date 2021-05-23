@@ -2,9 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import Player from './components/Player';
 import VideoSelector from './components/VideoSelector';
+import Remote from './components/Remote';
 import SubtitlesSelector from './components/SubtitlesSelector';
 import socketIOClient from "socket.io-client";
-//const ENDPOINT = "http://192.168.0.87:8080";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
+const ENDPOINT = "http://localhost:8080";
 
 
 function App() {
@@ -71,11 +78,18 @@ function App() {
   }
 
   return (
-    <div>
-      <VideoSelector onSelect={onSelectFile}></VideoSelector>
-      <SubtitlesSelector onSelect={onAddSubtitle}></SubtitlesSelector>
-      <Player ref={player} source={videoFile} subtitles={subtitles} onTimeUpdate={onTimeUpdate} onPlay={onPlay} onPause={onPause} onSeek={onSeek}></Player>
-    </div>
+    <Router>
+      <Switch>
+        <Route exact path="/">
+          <VideoSelector onSelect={onSelectFile}></VideoSelector>
+          <SubtitlesSelector onSelect={onAddSubtitle}></SubtitlesSelector>
+          <Player ref={player} source={videoFile} subtitles={subtitles} onTimeUpdate={onTimeUpdate} onPlay={onPlay} onPause={onPause} onSeek={onSeek}></Player>
+        </Route>
+        <Route path="/remote">
+          <Remote onPlay={onPlay} onPause={onPause}></Remote>
+        </Route>
+      </Switch>
+    </Router>
   );
 }
 
