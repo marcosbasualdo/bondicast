@@ -6,7 +6,7 @@ import Remote from './components/Remote';
 import SubtitlesSelector from './components/SubtitlesSelector';
 import socketIOClient from "socket.io-client";
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Switch,
   Route,
   Link
