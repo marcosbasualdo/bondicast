@@ -17,10 +17,11 @@
     "socket.io": "^4.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node server.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "start-react": "react-scripts start"
   },
   "eslintConfig": {
     "extends": [

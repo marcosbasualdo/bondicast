@@ -4,7 +4,7 @@ import Player from './components/Player';
 import VideoSelector from './components/VideoSelector';
 import SubtitlesSelector from './components/SubtitlesSelector';
 import socketIOClient from "socket.io-client";
-const ENDPOINT = "http://192.168.0.87:8080";
+//const ENDPOINT = "http://192.168.0.87:8080";
 
 
 function App() {
@@ -20,7 +20,7 @@ function App() {
   let socket;
 
   useEffect(() => {
-    socket = socketIOClient(ENDPOINT);
+    socket = socketIOClient();
 
     socket.on('play', () => {
       emitPlay = false;
