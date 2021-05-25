@@ -8,8 +8,8 @@ function SubtitlesSelector({onSelect}){
         let file = event.target.files[0];
 
         if(isSrt(file.name)){
-            const vttConverter = new VTTConverter(file)
-            onSelect(await vttConverter.getURL())
+            const vttConverter = new VTTConverter(file);
+            onSelect(await vttConverter.getURL());
         }else if (isVTT(file.name)){
             let reader = new FileReader();
             reader.readAsText(file, "UTF-8");

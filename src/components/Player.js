@@ -38,7 +38,11 @@ const Player = forwardRef(({source, subtitles, onTimeUpdate, onPlay, onPause, on
 
         seek: (time) => {
             player.current.currentTime = time
-        }        
+        },
+
+        get paused() {
+            return player.current.paused;
+        }
     
       }));
 

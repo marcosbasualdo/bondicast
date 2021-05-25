@@ -8,7 +8,8 @@ const io = new Server(server,   {cors: {
     origin: "http://localhost:3000",
     methods: ["GET", "POST"]
   }});
-const cors = require('cors')
+const cors = require('cors');
+const { timeStamp } = require('console');
 const port = process.env.PORT || 8080;
 
 app.use(cors())
@@ -25,22 +26,45 @@ app.get('/ping', function (req, res) {
 
    app.listen();
 
+const initialState = {
+  trigger: 'heartbeat',
+  time: 0,
+  paused: true,
+  get timestamp(){
+    return (new Date()).getTime();
+  }
+}
+
+let state = initialState;
+
+const broadcastState = (socket, trigger = 'heartbeat') => {
+  socket.broadcast.emit('state', {...state, trigger: trigger})
+}
+
 io.on('connection', (socket) => {
     console.log('connected')
     socket.on('disconnect', () => {
+        if(io.engine.clientsCount == 0){
+          state = initialState;
+        }
         console.log('disconnected')
     })
 
+    socket.emit('state', state)
+
     socket.on('pause', () => {
-        socket.broadcast.emit('pause')
+        state = {...state, paused: true};
+        broadcastState(socket, 'pause')
     })
 
     socket.on('play', () => {
-        socket.broadcast.emit('play')
+      state = {...state, paused: false};
+      broadcastState(socket, 'play')
     })
 
     socket.on('seek', (time) => {
-        socket.broadcast.emit('seek', time)
+      state = {...state, time: time};
+      socket.broadcast.emit('seek', time)
     })
 })
 
