@@ -27,7 +27,7 @@ function App() {
   let emitSeek = true;
   
   useEffect(() => {
-    socket = socketIOClient();
+    socket.current = socketIOClient();
 
     socket.current.on('state', (state) => {
       console.log('received state')
