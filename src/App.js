@@ -92,18 +92,32 @@ function App() {
   }
 
   return (
-    <Router>
-      <Switch>
-        <Route exact path="/">
-          <VideoSelector onSelect={onSelectFile}></VideoSelector>
-          <SubtitlesSelector onSelect={onAddSubtitle}></SubtitlesSelector>
-          <Player ref={player} source={videoFile} subtitles={subtitles} onTimeUpdate={onTimeUpdate} onPlay={onPlay} onPause={onPause} onSeek={onSeek}></Player>
-        </Route>
-        <Route path="/remote">
-          <Remote onPlay={onPlay} onPause={onPause} paused={paused}></Remote>
-        </Route>
-      </Switch>
-    </Router>
+    <>
+  <nav className="navbar navbar-light bg-light mb-3">
+    <div className="container-fluid">
+      <span className="navbar-brand mb-0 h1">Bondicast</span>
+    </div>
+  </nav>
+    <div className="container-fluid">
+      
+      <Router>
+        <Switch>
+          <Route exact path="/">
+            <div>
+              <VideoSelector onSelect={onSelectFile}></VideoSelector>
+              <SubtitlesSelector onSelect={onAddSubtitle}></SubtitlesSelector>
+            </div>
+            <div>
+              <Player ref={player} source={videoFile} subtitles={subtitles} onTimeUpdate={onTimeUpdate} onPlay={onPlay} onPause={onPause} onSeek={onSeek}></Player>
+            </div>
+          </Route>
+          <Route path="/remote">
+            <Remote onPlay={onPlay} onPause={onPause} paused={paused}></Remote>
+          </Route>
+        </Switch>
+      </Router>
+    </div>
+    </>
   );
 }
 
