@@ -18,32 +18,46 @@ function App() {
 
   const [videoFile, setVideoFile] = useState();
   const [subtitles, setSubtitles] = useState([]);
+  const [paused, setPaused] = useState(false);
   const player = useRef();
+  const socket = useRef();
   
-  let emitSeek = true;
   let emitPlay = true;
   let emitPause = true;
-
-  let socket;
-
+  let emitSeek = true;
+  
   useEffect(() => {
     socket = socketIOClient();
 
-    socket.on('play', () => {
-      emitPlay = false;
-      player.current.play()
+    socket.current.on('state', (state) => {
+      console.log('received state')
+      setPaused(state.paused);
     })
 
-    socket.on('pause', () => {
-      emitPause = false;
-      player.current.pause()
-    })
-
-    socket.on('seek', (time) => {
+    socket.current.on('seek', (time) => {
       emitSeek = false;
-      player.current.seek(time)
+      if(player.current){
+        player.current.seek(time)
+      }
     })
+
+    return () => socket.current.disconnect();
+
   }, []);  
+
+  useEffect(() => {
+    if(videoFile){
+      if(paused && player.current && !player.current.paused){
+        emitPause = false;
+        player.current.pause()
+      }
+      if(!paused && player.current && player.current.paused){
+        emitPlay = false;
+        player.current.play()
+      }
+    }
+
+  }, [paused])
 
   const onSelectFile = (video) => {
     setVideoFile(video);
@@ -57,22 +71,22 @@ function App() {
   }
 
   const onPlay = () => {
-    if(emitPlay){
-        socket.emit("play")
+    if(emitPlay && socket.current){
+        socket.current.emit("play")
     }
     emitPlay = true
   }
 
   const onPause = () => {
-    if(emitPause){
-      socket.emit("pause")
+    if(emitPause && socket.current){
+      socket.current.emit("pause")
     }
     emitPause = true
   }
 
   const onSeek = (time) => {
-    if(emitSeek){
-      socket.emit("seek", time)
+    if(emitSeek && socket.current){
+      socket.current.emit("seek", time)
     }
     emitSeek = true
   }
@@ -86,7 +100,7 @@ function App() {
           <Player ref={player} source={videoFile} subtitles={subtitles} onTimeUpdate={onTimeUpdate} onPlay={onPlay} onPause={onPause} onSeek={onSeek}></Player>
         </Route>
         <Route path="/remote">
-          <Remote onPlay={onPlay} onPause={onPause}></Remote>
+          <Remote onPlay={onPlay} onPause={onPause} paused={paused}></Remote>
         </Route>
       </Switch>
     </Router>

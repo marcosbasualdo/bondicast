@@ -1,10 +1,10 @@
 import React from 'react'
 
-function Remote({onPlay, onPause}){
+function Remote({onPlay, onPause, paused}){
     return (
         <div>
-            <button className="btn btn-primary" onClick={onPlay}>Play</button>
-            <button className="btn btn-secondary" onClick={onPause}>Pause</button>
+            {paused && (<button className="btn btn-primary" onClick={onPlay}>Play</button>)}
+            {!paused && (<button className="btn btn-secondary" onClick={onPause}>Pause</button>)}
         </div>        
     )
 }
