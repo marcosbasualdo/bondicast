@@ -71,7 +71,8 @@ function App() {
   const onTimeUpdate = (time) => {
   }
 
-  function openFullscreen(elem) {
+  const openFullscreen = () => {
+    let elem = container.current;
     if (elem.requestFullscreen) {
       elem.requestFullscreen();
     } else if (elem.webkitRequestFullscreen) { /* Safari */
@@ -82,7 +83,7 @@ function App() {
   }
 
   /* Close fullscreen */
-function closeFullscreen() {
+const closeFullscreen = () => {
   if (document.exitFullscreen) {
     document.exitFullscreen();
   } else if (document.webkitExitFullscreen) { /* Safari */
@@ -91,10 +92,6 @@ function closeFullscreen() {
     document.msExitFullscreen();
   }
 }
-
-  const onFullscreen = () => {
-    openFullscreen(container.current)
-  }
 
   const onPlay = () => {
     if(emitPlay && socket.current){
@@ -134,7 +131,7 @@ function closeFullscreen() {
                   <SubtitlesSelector onSelect={onAddSubtitle}></SubtitlesSelector>              
                 </div>
                 <div>
-                  <Player ref={player} source={videoFile} subtitles={subtitles} onFullscreen={onFullscreen} onExitFullscreen={closeFullscreen} onTimeUpdate={onTimeUpdate} onPlay={onPlay} onPause={onPause} onSeek={onSeek}></Player>
+                  <Player ref={player} source={videoFile} subtitles={subtitles} onFullscreen={openFullscreen} onExitFullscreen={closeFullscreen} onTimeUpdate={onTimeUpdate} onPlay={onPlay} onPause={onPause} onSeek={onSeek}></Player>
                 </div>
               </Route>
               <Route path="/remote">
