@@ -21,6 +21,7 @@ function App() {
   const [paused, setPaused] = useState(false);
   const player = useRef();
   const socket = useRef();
+  const container = useRef();
   
   let emitPlay = true;
   let emitPause = true;
@@ -70,6 +71,31 @@ function App() {
   const onTimeUpdate = (time) => {
   }
 
+  function openFullscreen(elem) {
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { /* Safari */
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { /* IE11 */
+      elem.msRequestFullscreen();
+    }
+  }
+
+  /* Close fullscreen */
+function closeFullscreen() {
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if (document.webkitExitFullscreen) { /* Safari */
+    document.webkitExitFullscreen();
+  } else if (document.msExitFullscreen) { /* IE11 */
+    document.msExitFullscreen();
+  }
+}
+
+  const onFullscreen = () => {
+    openFullscreen(container.current)
+  }
+
   const onPlay = () => {
     if(emitPlay && socket.current){
         socket.current.emit("play")
@@ -92,32 +118,32 @@ function App() {
   }
 
   return (
-    <>
-  <nav className="navbar navbar-light bg-light mb-3">
-    <div className="container-fluid">
-      <span className="navbar-brand mb-0 h1">Bondicast</span>
+    <div ref={container} className="app-container">
+      <nav className="navbar navbar-light bg-light mb-3">
+        <div className="container-fluid">
+          <span className="navbar-brand mb-0 h1">Bondicast</span>
+        </div>
+      </nav>
+        <div className="container-fluid">
+          
+          <Router>
+            <Switch>
+              <Route exact path="/">
+                <div className="controls">
+                  <VideoSelector onSelect={onSelectFile}></VideoSelector>
+                  <SubtitlesSelector onSelect={onAddSubtitle}></SubtitlesSelector>              
+                </div>
+                <div>
+                  <Player ref={player} source={videoFile} subtitles={subtitles} onFullscreen={onFullscreen} onExitFullscreen={closeFullscreen} onTimeUpdate={onTimeUpdate} onPlay={onPlay} onPause={onPause} onSeek={onSeek}></Player>
+                </div>
+              </Route>
+              <Route path="/remote">
+                <Remote onPlay={onPlay} onPause={onPause} paused={paused}></Remote>
+              </Route>
+            </Switch>
+          </Router>
+        </div>
     </div>
-  </nav>
-    <div className="container-fluid">
-      
-      <Router>
-        <Switch>
-          <Route exact path="/">
-            <div>
-              <VideoSelector onSelect={onSelectFile}></VideoSelector>
-              <SubtitlesSelector onSelect={onAddSubtitle}></SubtitlesSelector>
-            </div>
-            <div>
-              <Player ref={player} source={videoFile} subtitles={subtitles} onTimeUpdate={onTimeUpdate} onPlay={onPlay} onPause={onPause} onSeek={onSeek}></Player>
-            </div>
-          </Route>
-          <Route path="/remote">
-            <Remote onPlay={onPlay} onPause={onPause} paused={paused}></Remote>
-          </Route>
-        </Switch>
-      </Router>
-    </div>
-    </>
   );
 }
 

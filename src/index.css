@@ -11,3 +11,72 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+.app-container:fullscreen .controls, .app-container:fullscreen .navbar {
+  display: none;
+}
+
+.app-container:fullscreen video {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+video::-webkit-media-controls-fullscreen-button
+{
+  display: none !important;
+}
+
+
+.player {
+  position: relative;
+}
+
+.app-container:fullscreen .player {
+  position: static;
+}
+
+.player.player--controls .player-control {
+  opacity: 1;
+  transition: none;
+}
+
+.player-control {
+  opacity: 0;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1;
+  transition: opacity 1s;
+  background: none;
+  border: none;
+  color: white;
+  margin: 0;
+  padding: 8px;
+  border-radius: 100px;
+}
+
+.player-control:hover {
+  background-color: rgba(255,255,255,.1);
+}
+
+.player-control svg {
+  width: 30px;
+  height: 30px;
+}
+
+.player-control.player-control--fullscreenexit {
+  display: none;
+}
+
+*:fullscreen .player-control.player-control--fullscreen {
+  display: none;
+}
+
+*:fullscreen .player-control.player-control--fullscreenexit {
+  display: inline-block;
+}
+
