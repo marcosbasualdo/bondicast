@@ -8,7 +8,7 @@ function VideoSelector({onSelect}){
 
     return (
         <div className="input-group mb-3">
-            <label className="input-group-text" for="inputGroupFile01">Video</label>
+            <label className="input-group-text" htmlFor="inputGroupFile01">Video</label>
             <input onChange={onChange} type="file" accept="video/*" className="form-control"/>
         </div>
     )

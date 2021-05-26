@@ -35,7 +35,7 @@ function SubtitlesSelector({onSelect}){
 
     return (
         <div className="input-group mb-3">
-            <label className="input-group-text" for="inputGroupFile01">Subtítulo</label>
+            <label className="input-group-text" htmlFor="inputGroupFile01">Subtítulo</label>
             <input onChange={onChange} type="file" accept=".srt,.vtt" className="form-control"/>
         </div>
     )
