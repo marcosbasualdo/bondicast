@@ -80,3 +80,8 @@ video::-webkit-media-controls-fullscreen-button
   display: inline-block;
 }
 
+.remote button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
