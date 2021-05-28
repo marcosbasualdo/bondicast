@@ -12,6 +12,27 @@ const Player = forwardRef(({source, subtitles, onTimeUpdate, onPlay, onPause, on
         setShowControls(false);
     },2500));
 
+    const currentTimeout = useRef();
+    const eventsStack = useRef([]);
+    const emit = useRef(true);
+
+    const sendEvent = (key, fn) => {
+        eventsStack.current = [...eventsStack.current, {key, fn}]
+        if(!currentTimeout.current){
+            currentTimeout.current = setTimeout(() => {
+                let elem = (eventsStack.current.find(el => el.key == 'seeked') || eventsStack.current.pop());
+                if(elem && elem.fn){
+                    if(emit.current){
+                        elem.fn();
+                    }
+                    emit.current = true
+                }
+                eventsStack.current = []
+                currentTimeout.current = undefined
+            },300)
+        }
+    }
+
     const mouseOutted = useRef(false);
 
     const onMouseMove = useRef(throttle(() => {
@@ -22,41 +43,48 @@ const Player = forwardRef(({source, subtitles, onTimeUpdate, onPlay, onPause, on
         mouseOutted.current = false;
     },100));
 
-    const onPlayerSeek = useRef(debounce((event) => {
-        onSeek(player.current.currentTime)
-    },100));
-
     useEffect(() => {
         player.current.load();
     }, [source])
 
     useEffect(() => {
-        player.current.addEventListener('timeupdate', (event) => {
-            onTimeUpdate(player.current.currentTime)
-        });
+        const onPlayerPlay = ((event) => {
+            sendEvent('play', (() => onPlay(event)).bind(this))
+        }).bind(this)
 
-        player.current.addEventListener('play', (event) => {
-            onPlay(event)
-        })
+        const onPlayerPause = ((event) => {
+            sendEvent('pause', (() => onPause(event)).bind(this))
+        }).bind(this)
 
-        player.current.addEventListener('pause', (event) => {
-            onPause(event)
-        })
+        const onPlayerSeek = (() => {
+            sendEvent('seeked', (() => onSeek(player.current.currentTime)).bind(this))
+        }).bind(this)
 
-        player.current.addEventListener('seeked', onPlayerSeek.current)
+        player.current.addEventListener('pause', onPlayerPause)
+        player.current.addEventListener('seeked', onPlayerSeek)
+        player.current.addEventListener('play', onPlayerPlay)
+
+        return () => {
+            player.current.removeEventListener('pause', onPlayerPause)
+            player.current.removeEventListener('seeked', onPlayerSeek)
+            player.current.removeEventListener('play', onPlayerPlay)
+        }
     },[])
 
     useImperativeHandle(ref, () => ({
 
-        play: () => {
+        play: (emitEvent = true) => {
+            emit.current = emitEvent
             player.current.play()
         },
 
-        pause: () => {
+        pause: (emitEvent = true) => {
+            emit.current = emitEvent
             player.current.pause()
         },
 
-        seek: (time) => {
+        seek: (time, emitEvent = true) => {
+            emit.current = emitEvent
             player.current.currentTime = time
         },
 

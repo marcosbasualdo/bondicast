@@ -6,6 +6,7 @@ import Remote from './components/Remote';
 import SubtitlesSelector from './components/SubtitlesSelector';
 import TimelineEvents from './components/TimelineEvents';
 import NameSelector from './components/NameSelector';
+import RecentTimelineEvents from './components/RecentTimelineEvents'
 import socketIOClient from "socket.io-client";
 import {openFullscreen, closeFullscreen} from './utils'
 import {
@@ -22,9 +23,9 @@ function App() {
   const [subtitles, setSubtitles] = useState([]);
   const [paused, setPaused] = useState(false);
   const [name, setName] = useState('');
-  const emit = useRef(true);
   const nameRef = useRef(name)
   const [timelineEvents, setTimelineEvents] = useState([]);
+  const [lastEvent, setLastEvent] = useState();
   const player = useRef();
   const socket = useRef();
   const container = useRef();
@@ -37,8 +38,7 @@ function App() {
       setPaused(state.paused);
       if(state.trigger == 'seek'){
         if(player.current){
-          emit.current = false
-          player.current.seek(state.time)
+          player.current.seek(state.time, false)
         }
       }
     })
@@ -51,6 +51,7 @@ function App() {
       setTimelineEvents((currentEvents) => {
         return [...currentEvents, event]
       })
+      setLastEvent(event)
     })
 
     return () => socket.current.disconnect();
@@ -63,18 +64,15 @@ function App() {
 
 
   useEffect(() => {
-    if(videoFile){
+    if(videoFile && player.current){
       if(paused){
-        if(player.current && !player.current.paused){
-          emit.current = false; 
-          player.current.pause()
+        if(!player.current.paused){
+          player.current.pause(false)
         }
       }else{
-        if(player.current && player.current.paused){
-          emit.current = false; 
-          player.current.play()
+        if(player.current.paused){
+          player.current.play(false)
         }
-        
       }
     }
   }, [paused])
@@ -91,20 +89,21 @@ function App() {
   }
 
   const playerEmit = (event, data = {}) => {
-    if(emit.current && socket.current){
+    if(socket.current){
       let time = data.time || (player.current && player.current.currentTime) || 0
       let d = {...data, time, author: nameRef.current}
       socket.current.emit(event, d)
     }    
-    emit.current = true
   }
 
   const onPlay = () => {
     playerEmit('play')
+    setPaused(false)
   }
 
   const onPause = () => {
     playerEmit('pause')
+    setPaused(true)
   }
 
   const onSeek = () => {
@@ -150,6 +149,7 @@ function App() {
                 </div>
                 <div>
                   <Player ref={player} source={videoFile} subtitles={subtitles} onFullscreen={() => openFullscreen(container.current)} onExitFullscreen={closeFullscreen} onTimeUpdate={onTimeUpdate} onPlay={onPlay} onPause={onPause} onSeek={onSeek}></Player>
+                  <RecentTimelineEvents event={lastEvent}></RecentTimelineEvents>
                 </div>
                 {false && (<div>
                   <TimelineEvents onTimeSelected={onTimeSelected} timelineEvents={timelineEvents} onSendMessage={onSendMessage}></TimelineEvents>
