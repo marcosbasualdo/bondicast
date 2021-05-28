@@ -31,7 +31,7 @@ function App() {
   
   useEffect(() => {
 
-    socket.current = socketIOClient(ENDPOINT);
+    socket.current = socketIOClient();
 
     socket.current.on('state', (state) => {
       setPaused(state.paused);
