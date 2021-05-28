@@ -22,6 +22,10 @@ const Player = forwardRef(({source, subtitles, onTimeUpdate, onPlay, onPause, on
         mouseOutted.current = false;
     },100));
 
+    const onPlayerSeek = useRef(debounce((event) => {
+        onSeek(player.current.currentTime)
+    },100));
+
     useEffect(() => {
         player.current.load();
     }, [source])
@@ -39,9 +43,7 @@ const Player = forwardRef(({source, subtitles, onTimeUpdate, onPlay, onPause, on
             onPause(event)
         })
 
-        player.current.addEventListener('seeked', (event) => {
-            onSeek(player.current.currentTime)
-        })
+        player.current.addEventListener('seeked', onPlayerSeek.current)
     },[])
 
     useImperativeHandle(ref, () => ({
@@ -60,6 +62,10 @@ const Player = forwardRef(({source, subtitles, onTimeUpdate, onPlay, onPause, on
 
         get paused() {
             return player.current.paused;
+        },
+
+        get currentTime() {
+            return player.current.currentTime;
         }
     
     }));
