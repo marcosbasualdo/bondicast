@@ -6,6 +6,7 @@ import Remote from './components/Remote';
 import SubtitlesSelector from './components/SubtitlesSelector';
 import TimelineEvents from './components/TimelineEvents';
 import NameSelector from './components/NameSelector';
+import RecentTimelineEvents from './components/RecentTimelineEvents'
 import socketIOClient from "socket.io-client";
 import {openFullscreen, closeFullscreen} from './utils'
 import {
@@ -25,6 +26,7 @@ function App() {
   const emit = useRef(true);
   const nameRef = useRef(name)
   const [timelineEvents, setTimelineEvents] = useState([]);
+  const [lastEvent, setLastEvent] = useState();
   const player = useRef();
   const socket = useRef();
   const container = useRef();
@@ -51,6 +53,7 @@ function App() {
       setTimelineEvents((currentEvents) => {
         return [...currentEvents, event]
       })
+      setLastEvent(event)
     })
 
     return () => socket.current.disconnect();
@@ -150,6 +153,7 @@ function App() {
                 </div>
                 <div>
                   <Player ref={player} source={videoFile} subtitles={subtitles} onFullscreen={() => openFullscreen(container.current)} onExitFullscreen={closeFullscreen} onTimeUpdate={onTimeUpdate} onPlay={onPlay} onPause={onPause} onSeek={onSeek}></Player>
+                  <RecentTimelineEvents event={lastEvent}></RecentTimelineEvents>
                 </div>
                 {false && (<div>
                   <TimelineEvents onTimeSelected={onTimeSelected} timelineEvents={timelineEvents} onSendMessage={onSendMessage}></TimelineEvents>
