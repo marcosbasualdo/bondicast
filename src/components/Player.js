@@ -14,6 +14,7 @@ const Player = forwardRef(({source, subtitles, onTimeUpdate, onPlay, onPause, on
 
     const currentTimeout = useRef();
     const eventsStack = useRef([]);
+    const emit = useRef(true);
 
     const sendEvent = (key, fn) => {
         eventsStack.current = [...eventsStack.current, {key, fn}]
@@ -21,7 +22,10 @@ const Player = forwardRef(({source, subtitles, onTimeUpdate, onPlay, onPause, on
             currentTimeout.current = setTimeout(() => {
                 let elem = (eventsStack.current.find(el => el.key == 'seeked') || eventsStack.current.pop());
                 if(elem && elem.fn){
-                    elem.fn();
+                    if(emit.current){
+                        elem.fn();
+                    }
+                    emit.current = true
                 }
                 eventsStack.current = []
                 currentTimeout.current = undefined
@@ -69,15 +73,18 @@ const Player = forwardRef(({source, subtitles, onTimeUpdate, onPlay, onPause, on
 
     useImperativeHandle(ref, () => ({
 
-        play: () => {
+        play: (emitEvent = true) => {
+            emit.current = emitEvent
             player.current.play()
         },
 
-        pause: () => {
+        pause: (emitEvent = true) => {
+            emit.current = emitEvent
             player.current.pause()
         },
 
-        seek: (time) => {
+        seek: (time, emitEvent = true) => {
+            emit.current = emitEvent
             player.current.currentTime = time
         },
 

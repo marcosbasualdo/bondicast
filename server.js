@@ -78,7 +78,7 @@ io.on('connection', (socket) => {
       state = {...state, time: time};
       broadcastState(socket, 'seek')
 
-      let timelineEvent = {author, message: `seeked to ${time}`, time, type: 'PLAYER_EVENT'};
+      let timelineEvent = {author, message: `seeked to ${new Date(time * 1000).toISOString().substr(11, 8)}`, time, type: 'PLAYER_EVENT'};
       timelineEvents = [...timelineEvents, timelineEvent]
       io.emit('timelineEvent', timelineEvent)
     })

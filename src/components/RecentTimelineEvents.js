@@ -31,7 +31,7 @@ function RecentTimelineEvents({event}) {
 
     return (
         <div className="recent-events">
-            {current && <div>{current.author || 'Anonymous'}{current.type == 'MESSAGE' ? ':' : ''} {current.message}</div>}
+            {current && <div className="recent-events__item">{current.author || 'Anonymous'}{current.type == 'MESSAGE' ? ':' : ''} {current.message}</div>}
         </div>
     )
 

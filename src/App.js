@@ -23,7 +23,6 @@ function App() {
   const [subtitles, setSubtitles] = useState([]);
   const [paused, setPaused] = useState(false);
   const [name, setName] = useState('');
-  const emit = useRef(true);
   const nameRef = useRef(name)
   const [timelineEvents, setTimelineEvents] = useState([]);
   const [lastEvent, setLastEvent] = useState();
@@ -39,8 +38,7 @@ function App() {
       setPaused(state.paused);
       if(state.trigger == 'seek'){
         if(player.current){
-          emit.current = false
-          player.current.seek(state.time)
+          player.current.seek(state.time, false)
         }
       }
     })
@@ -66,18 +64,15 @@ function App() {
 
 
   useEffect(() => {
-    if(videoFile){
+    if(videoFile && player.current){
       if(paused){
-        if(player.current && !player.current.paused){
-          emit.current = false; 
-          player.current.pause()
+        if(!player.current.paused){
+          player.current.pause(false)
         }
       }else{
-        if(player.current && player.current.paused){
-          emit.current = false; 
-          player.current.play()
+        if(player.current.paused){
+          player.current.play(false)
         }
-        
       }
     }
   }, [paused])
@@ -94,20 +89,21 @@ function App() {
   }
 
   const playerEmit = (event, data = {}) => {
-    if(emit.current && socket.current){
+    if(socket.current){
       let time = data.time || (player.current && player.current.currentTime) || 0
       let d = {...data, time, author: nameRef.current}
       socket.current.emit(event, d)
     }    
-    emit.current = true
   }
 
   const onPlay = () => {
     playerEmit('play')
+    setPaused(false)
   }
 
   const onPause = () => {
     playerEmit('pause')
+    setPaused(true)
   }
 
   const onSeek = () => {
