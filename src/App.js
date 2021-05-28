@@ -23,7 +23,6 @@ function App() {
   const [paused, setPaused] = useState(false);
   const [name, setName] = useState('');
   const emit = useRef(true);
-  const ignoreNextSeek = useRef(false);
   const nameRef = useRef(name)
   const [timelineEvents, setTimelineEvents] = useState([]);
   const player = useRef();
@@ -39,9 +38,8 @@ function App() {
       if(state.trigger == 'seek'){
         if(player.current){
           emit.current = false
-            player.current.seek(state.time)
-          }
-          ignoreNextSeek.current = false
+          player.current.seek(state.time)
+        }
       }
     })
 
@@ -96,9 +94,6 @@ function App() {
     if(emit.current && socket.current){
       let time = data.time || (player.current && player.current.currentTime) || 0
       let d = {...data, time, author: nameRef.current}
-      if(event == 'seek'){
-        ignoreNextSeek.current = true;
-      }
       socket.current.emit(event, d)
     }    
     emit.current = true
