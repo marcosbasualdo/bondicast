@@ -37,6 +37,8 @@ const initialState = {
 
 let state = initialState;
 
+let timelineEvents = [];
+
 const broadcastState = (socket, trigger = 'heartbeat') => {
   socket.broadcast.emit('state', {...state, trigger: trigger})
 }
@@ -46,25 +48,45 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         if(io.engine.clientsCount == 0){
           state = initialState;
+          timelineEvents = [];
         }
         console.log('disconnected')
     })
 
     socket.emit('state', state)
+    socket.emit('timelineEvents', timelineEvents)
 
-    socket.on('pause', () => {
+    socket.on('pause', ({author, time}) => {
         state = {...state, paused: true};
         broadcastState(socket, 'pause')
+
+        let timelineEvent = {author, message: `paused`, time, type: 'PLAYER_EVENT'};
+        timelineEvents = [...timelineEvents, timelineEvent]
+        io.emit('timelineEvent', timelineEvent)
     })
 
-    socket.on('play', () => {
+    socket.on('play', ({author, time}) => {
       state = {...state, paused: false};
       broadcastState(socket, 'play')
+
+      let timelineEvent = {author, message: `played`, time, type: 'PLAYER_EVENT'};
+      timelineEvents = [...timelineEvents, timelineEvent]
+      io.emit('timelineEvent', timelineEvent)
     })
 
-    socket.on('seek', (time) => {
+    socket.on('seek', ({author, time}) => {
       state = {...state, time: time};
-      socket.broadcast.emit('seek', time)
+      broadcastState(socket, 'seek')
+
+      let timelineEvent = {author, message: `seeked to ${time}`, time, type: 'PLAYER_EVENT'};
+      timelineEvents = [...timelineEvents, timelineEvent]
+      io.emit('timelineEvent', timelineEvent)
+    })
+
+    socket.on('message', ({author, time, message}) => {
+      let timelineEvent = {author, message, time, type: 'MESSAGE'};
+      timelineEvents = [...timelineEvents, timelineEvent]
+      io.emit('timelineEvent', timelineEvent)
     })
 })
 
