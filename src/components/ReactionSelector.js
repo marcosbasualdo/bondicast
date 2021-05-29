@@ -1,6 +1,6 @@
 function ReactionSelector({onReaction}) {
 
-    const reactions = ['🤣','😍','😑','😴','🤐','😔','😲','😤','😭']
+    const reactions = ['🤣','😍','😑','😴','🤐','😔','😲','😤','😭','💩','🤮','🙈']
 
     return (
         <div className="reactions-selector">
