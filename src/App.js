@@ -4,9 +4,10 @@ import Player from './components/Player';
 import VideoSelector from './components/VideoSelector';
 import Remote from './components/Remote';
 import SubtitlesSelector from './components/SubtitlesSelector';
-import TimelineEvents from './components/TimelineEvents';
+//import TimelineEvents from './components/TimelineEvents';
 import NameSelector from './components/NameSelector';
 import RecentTimelineEvents from './components/RecentTimelineEvents'
+import ReactionSelector from './components/ReactionSelector'
 import socketIOClient from "socket.io-client";
 import {openFullscreen, closeFullscreen} from './utils'
 import {
@@ -121,7 +122,7 @@ function App() {
   }
 
   const onSendMessage = (message) => {
-    let data = {author: nameRef.current, message, time: player.current.currentTime}
+    let data = {author: nameRef.current, message, time: (player.current && player.current.currentTime) || 0}
     socket.current.emit('message', data)
   }
 
@@ -132,7 +133,7 @@ function App() {
   }
 
   return (
-    <div ref={container} className="app-container">
+    <div className="app-container">
       <nav className="navbar navbar-light bg-light mb-3">
         <div className="container-fluid">
           <span className="navbar-brand mb-0 h1">Bondicast</span>
@@ -147,16 +148,22 @@ function App() {
                   <SubtitlesSelector onSelect={onAddSubtitle}></SubtitlesSelector>    
                   <NameSelector name={name} setName={setName}></NameSelector>
                 </div>
-                <div>
+                <div ref={container} className="player-container">
                   <Player ref={player} source={videoFile} subtitles={subtitles} onFullscreen={() => openFullscreen(container.current)} onExitFullscreen={closeFullscreen} onTimeUpdate={onTimeUpdate} onPlay={onPlay} onPause={onPause} onSeek={onSeek}></Player>
                   <RecentTimelineEvents event={lastEvent}></RecentTimelineEvents>
                 </div>
-                {false && (<div>
-                  <TimelineEvents onTimeSelected={onTimeSelected} timelineEvents={timelineEvents} onSendMessage={onSendMessage}></TimelineEvents>
-                </div>)}
               </Route>
               <Route path="/remote">
-                <Remote name={name} setName={setName} onPlay={remoteOnPlay} onPause={remoteOnPause} paused={paused}></Remote>
+                <div className="remote-container">
+                  <div className="mb-3">
+                    <NameSelector name={name} setName={setName}></NameSelector>  
+                  </div>
+                  <div className="mb-3">
+                    <Remote name={name} setName={setName} onPlay={remoteOnPlay} onPause={remoteOnPause} paused={paused}></Remote>
+                  </div>
+                  <ReactionSelector onReaction={onSendMessage}></ReactionSelector>
+                  {/*<TimelineEvents onTimeSelected={onTimeSelected} timelineEvents={timelineEvents} onSendMessage={onSendMessage}></TimelineEvents>*/}
+                </div>
               </Route>
             </Switch>
           </Router>
