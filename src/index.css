@@ -13,11 +13,11 @@ code {
 }
 
 
-.app-container:fullscreen .controls, .app-container:fullscreen .navbar {
+.player-container:fullscreen .controls, .app-container:fullscreen .navbar {
   display: none;
 }
 
-.app-container:fullscreen video {
+.player-container:fullscreen video {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -35,7 +35,7 @@ video::-webkit-media-controls-fullscreen-button
   position: relative;
 }
 
-.app-container:fullscreen .player {
+.player-container:fullscreen .player {
   position: static;
 }
 
@@ -86,18 +86,60 @@ video::-webkit-media-controls-fullscreen-button
   justify-content: center;
 }
 
+.player-container {
+  position: relative;
+}
+
+
 .recent-events {
   position: absolute;
-  right: 0;
-  bottom: 0;
+  left: 0;
+  top: 0;
 }
 
 .recent-events__item {
   background: rgba(0,0,0,.8);
   color: white;
-  font-size: 3rem;
+  font-size: 1.5rem;
   border-radius: 10px;
-  padding: 15px 35px;
-  margin-bottom: 100px;
-  margin-right: 50px;
+  padding: 10px 20px;
+  margin-top: 20px;
+  margin-left: 20px;
+}
+
+
+.recent-events__item--message .recent-event__item__name {
+  display: block;
+  font-size: 1.2rem;
+}
+
+@media only screen and (max-width: 1024px) {
+  .recent-events__item {
+    font-size: 1rem;
+  }
+  .recent-events__item--message .recent-event__item__name {
+    font-size: 1rem;
+  }
+}
+
+*:fullscreen .recent-events__item {
+  font-size: 3rem;
+}
+
+*:fullscreen .recent-events__item--message .recent-event__item__name {
+  font-size: 2rem;
+}
+
+.reactions-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1em;
+}
+
+.reactions-selector button {
+  height: 80px;
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1.7em;
 }
