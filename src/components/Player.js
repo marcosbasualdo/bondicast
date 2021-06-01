@@ -114,7 +114,7 @@ const Player = forwardRef(({source, subtitles, onTimeUpdate, onPlay, onPause, on
             </button>
             <video controls controlsList="nofullscreen nodownload" ref={player} src={source} className="video">
                 {subtitles.map(url => (
-                    <track key={url} label="Default" kind="subtitles" src={url}></track>
+                    <track key={url} label="Default" kind="subtitles" src={url} default></track>
                 ))}
             </video>
         </div>
