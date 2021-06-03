@@ -24,7 +24,6 @@ function App() {
   const [subtitles, setSubtitles] = useState([]);
   const [paused, setPaused] = useState(false);
   const [name, setName] = useState('');
-  const nameRef = useRef(name)
   const [timelineEvents, setTimelineEvents] = useState([]);
   const [lastEvent, setLastEvent] = useState();
   const player = useRef();
@@ -60,11 +59,6 @@ function App() {
   }, []);  
 
   useEffect(() => {
-    nameRef.current = name
-  }, [name])
-
-
-  useEffect(() => {
     if(videoFile && player.current){
       if(paused){
         if(!player.current.paused){
@@ -92,7 +86,7 @@ function App() {
   const playerEmit = (event, data = {}) => {
     if(socket.current){
       let time = data.time || (player.current && player.current.currentTime) || 0
-      let d = {...data, time, author: nameRef.current}
+      let d = {...data, time, author: name}
       socket.current.emit(event, d)
     }    
   }
@@ -122,7 +116,7 @@ function App() {
   }
 
   const onSendMessage = (message) => {
-    let data = {author: nameRef.current, message, time: (player.current && player.current.currentTime) || 0}
+    let data = {author: name, message, time: (player.current && player.current.currentTime) || 0}
     socket.current.emit('message', data)
   }
 

@@ -47,29 +47,17 @@ const Player = forwardRef(({source, subtitles, onTimeUpdate, onPlay, onPause, on
         player.current.load();
     }, [source])
 
-    useEffect(() => {
-        const onPlayerPlay = ((event) => {
-            sendEvent('play', (() => onPlay(event)).bind(this))
-        }).bind(this)
+    const onPlayerPlay = ((event) => {
+        sendEvent('play', () => onPlay(event))
+    })
 
-        const onPlayerPause = ((event) => {
-            sendEvent('pause', (() => onPause(event)).bind(this))
-        }).bind(this)
+    const onPlayerPause = ((event) => {
+        sendEvent('pause', () => onPause(event))
+    })
 
-        const onPlayerSeek = (() => {
-            sendEvent('seeked', (() => onSeek(player.current.currentTime)).bind(this))
-        }).bind(this)
-
-        player.current.addEventListener('pause', onPlayerPause)
-        player.current.addEventListener('seeked', onPlayerSeek)
-        player.current.addEventListener('play', onPlayerPlay)
-
-        return () => {
-            player.current.removeEventListener('pause', onPlayerPause)
-            player.current.removeEventListener('seeked', onPlayerSeek)
-            player.current.removeEventListener('play', onPlayerPlay)
-        }
-    },[])
+    const onPlayerSeek = (() => {
+        sendEvent('seeked', () => onSeek(player.current.currentTime))
+    })
 
     useImperativeHandle(ref, () => ({
 
@@ -112,7 +100,7 @@ const Player = forwardRef(({source, subtitles, onTimeUpdate, onPlay, onPause, on
             <button className="player-control player-control--fullscreenexit" onClick={onExitFullscreen}>
                 <FullscreenExitIcon></FullscreenExitIcon>
             </button>
-            <video controls controlsList="nofullscreen nodownload" ref={player} src={source} className="video">
+            <video onPlay={onPlayerPlay} onPause={onPlayerPause} onSeeked={onPlayerSeek} controls controlsList="nofullscreen nodownload" ref={player} src={source} className="video">
                 {subtitles.map(url => (
                     <track key={url} label="Default" kind="subtitles" src={url} default></track>
                 ))}
